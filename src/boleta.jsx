@@ -6,11 +6,13 @@ import jsPDF from 'jspdf';
 const Boleta = ({cliente}) => {
 
     const capturar = ()=>{
-        html2canvas(document.querySelector("#capture")).then(function(canvas) {
+        html2canvas(document.querySelector("#capture"), {
+            allowTaint: true,
+            logging:true
+        }).then(function(canvas) {
           const imgData = canvas.toDataURL('image/png');
           document.body.appendChild(canvas);
-          console.log(imgData);
-          window.open(imgData);
+          
           //const pdf = new jsPDF();
           //pdf.addImage(imgData, 'PNG', 0, 0);
           // pdf.output('dataurlnewwindow');
