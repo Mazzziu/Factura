@@ -1,7 +1,7 @@
 import React from 'react';
 import './App.css';
 import html2canvas from "html2canvas";
-import jsPDF from 'jspdf';
+//import jsPDF from 'jspdf';
 
 const Boleta = ({cliente}) => {
 
@@ -10,7 +10,7 @@ const Boleta = ({cliente}) => {
             allowTaint: true,
             logging:true
         }).then(function(canvas) {
-          const imgData = canvas.toDataURL('image/png');
+          //const imgData = canvas.toDataURL('image/png');
           document.body.appendChild(canvas);
           
           //const pdf = new jsPDF();

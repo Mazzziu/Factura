@@ -121,11 +121,11 @@ return (
   <tbody>
     {listaProductos.map((value, pos)=>(
       <tr>
-        <td scope="col">{pos}</td>
-        <td scope="col">{value.articulo}</td>
-        <td scope="col">{value.cantidad}</td>
-        <td scope="col">{value.precio}</td>
-        <td scope="col">{parseInt(value.cantidad) * parseInt(value.precio)}</td>
+        <td >{pos}</td>
+        <td >{value.articulo}</td>
+        <td >{value.cantidad}</td>
+        <td >{value.precio}</td>
+        <td >{parseInt(value.cantidad) * parseInt(value.precio)}</td>
     </tr>
     ))}
 
