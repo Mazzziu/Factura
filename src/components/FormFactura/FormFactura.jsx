@@ -1,12 +1,21 @@
-import React from "react";
+import React, { useRef, useState } from "react";
+import moment from "moment";
+import axios from "axios";
+
 //components
 import FormProductos from "./FormProductos";
 import TablaDeProductos from "./TablaDeProductos";
 import TotalFactura from "./TotalFactura";
-//hooks
-import useDatosFactura from "../../hooks/datosFactura";
+import ModalBoleta from "../Boleta/ModalBoleta";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
+import { Container, Row, Col, Button } from "react-bootstrap";
 
-const FormFactura = () => {
+//hooks
+import useDatosFactura from "../../hooks/useDatosFactura";
+import useDatosQR from "../../hooks/useDatosQR";
+
+const FormFactura = (props) => {
     const TYPE_CBT = [
         {
             Id: 6,
@@ -89,15 +98,39 @@ const FormFactura = () => {
         { Id: 22, Desc: "Tierra del Fuego" },
         { Id: 23, Desc: "Tucuman" },
     ];
-    //datos del cliente y factura
-    const [datosFactura, setDatosFactura] = useDatosFactura(DOC_TIPO, TYPE_CBT);
+    // const URL = "https://backend-facturalin.herokuapp.com/api/";
+    //const URL = "https://backend-facturalin.herokuapp.com/api/test/";
+    const URL = "https://backend-facturalin.herokuapp.com/api/";
 
+    //states
+    const [datosFactura, setDatosFactura] = useDatosFactura(DOC_TIPO, TYPE_CBT);
+    const [qr, setQr] = useState(""); //qr final que se pasa al modal
+    const [datosQR, setDatosQR] = useDatosQR(); //armado de datos del qr a transformar en base 64
+    const [startDate, setStartDate] = useState(moment().subtract(5, "d")._d);
+    const [openModal, setOpenModal] = useState(false);
+    const [loading, setLoading] = useState(false);
+
+    //Ref
+    const docNro = useRef();
+    const nombre = useRef();
+    const sinProd = useRef();
+
+    //handles
     const handleDatosFactura = (e) => {
-        setDatosFactura({
-            ...datosFactura,
-            [e.target.name]: e.target.value,
-        });
+        if (e.target.name === "cbteTipo" || e.target.name === "docTipo") {
+            setDatosFactura({
+                ...datosFactura,
+                [e.target.name]: JSON.parse(e.target.value),
+            });
+        } else {
+            setDatosFactura({
+                ...datosFactura,
+                [e.target.name]: e.target.value,
+            });
+        }
     };
+    const handleModal = (value) => setOpenModal(value);
+    //end-handles
 
     const addProduct = (product) => {
         const sumarTotal = (numero, attr) =>
@@ -108,10 +141,9 @@ const FormFactura = () => {
             productos: [...datosFactura.productos, product],
             total: sumarTotal(product.subtotal, "total"),
             iva: sumarTotal(product.ivaMonto, "iva"),
-            baseImp: sumarTotal(product.baseImponible, "baseImp"),
+            neto: sumarTotal(product.neto, "neto"),
         });
     };
-
     const deleteProducts = (product, pos) => {
         const restarTotal = (numeroARestar, attr) =>
             Number(datosFactura[attr]) - Number(numeroARestar);
@@ -126,145 +158,290 @@ const FormFactura = () => {
             productos: aux,
             total: restarTotal(product.subtotal, "total"),
             iva: restarTotal(product.ivaMonto, "iva"),
-            baseImp: restarTotal(product.baseImponible, "baseImp"),
+            neto: restarTotal(product.neto, "neto"),
         });
     };
 
-    return (
-        <div>
-            <div className='container'>
-                <h3>Datos del cliente</h3>
-                <div className='row'>
-                    <div className='col-12 col-md-6 mt-4'>
-                        <label htmlFor='type' className='form-label'>
-                            Tipo de comprobante
-                        </label>
-                        <select
-                            className='form-select'
-                            name='cbteTipo'
-                            onChange={handleDatosFactura}
-                        >
-                            {TYPE_CBT.map((type) => (
-                                <option key={`cbt-${type.Id}`} value={type.Id}>
-                                    {type.Desc}
-                                </option>
-                            ))}
-                        </select>
-                    </div>
-                    <div className='col-12 col-md-6 mt-4'>
-                        <label htmlFor='type' className='form-label'>
-                            Provincia
-                        </label>
-                        <select
-                            className='form-select'
-                            name='cbteTipo'
-                            onChange={handleDatosFactura}
-                        >
-                            {PROVINCIAS.map((type) => (
-                                <option
-                                    key={`provincia-${type.Id}`}
-                                    value={type.Desc}
-                                >
-                                    {type.Desc}
-                                </option>
-                            ))}
-                        </select>
-                    </div>
-                </div>
-                <div className='row'>
-                    <div className='col-12 col-md-2 mt-4'>
-                        <label htmlFor='docTipo' className='form-label'>
-                            Doc. Tipo
-                        </label>
-                        <select
-                            className='form-select'
-                            name='docTipo'
-                            onChange={handleDatosFactura}
-                        >
-                            {DOC_TIPO.map((type) => (
-                                <option key={`doc-${type.Id}`} value={type.Id}>
-                                    {type.Desc}
-                                </option>
-                            ))}
-                        </select>
-                    </div>
-                    <div className='col-12 col-md-4 mt-4'>
-                        <label htmlFor='nombre' className='form-label'>
-                            Numero
-                        </label>
-                        {parseInt(datosFactura.docTipo) === 99 ? (
-                            <input
-                                type='number'
-                                className='form-control'
-                                name='docNro'
-                                placeholder='Consumidor Final'
-                                disabled
-                            ></input>
-                        ) : (
-                            <input
-                                type='number'
-                                className='form-control'
-                                name='docNro'
-                                onChange={handleDatosFactura}
-                            ></input>
-                        )}
-                    </div>
-                    <div className='col-12 col-md-6 mt-4'>
-                        <label htmlFor='nombre' className='form-label'>
-                            Nombre o Razón social
-                        </label>
-                        {parseInt(datosFactura.docTipo) === 99 ? (
-                            <input
-                                type='text'
-                                className='form-control'
-                                name='nombre'
-                                placeholder='Consumidor Final'
-                                disabled
-                            ></input>
-                        ) : (
-                            <input
-                                type='text'
-                                className='form-control'
-                                name='nombre'
-                                onChange={handleDatosFactura}
-                            ></input>
-                        )}
-                    </div>
-                </div>
-                <hr />
+    //start-validates
+    const validarDocNro = () => {
+        let valid = true;
+        if (datosFactura.docTipo.Id == 99) {
+            return true;
+        } else if (
+            datosFactura.docTipo.Id == 80 ||
+            datosFactura.docTipo.Id == 86
+        ) {
+            let cuit = require("arg.js").cuit;
+            valid = cuit.isValid(datosFactura.docNro);
+        } else if (datosFactura.docTipo.Id == 96) {
+            let doc = require("arg.js").document;
+            valid = doc.isValidDni(datosFactura.docNro);
+        }
+        if (docNro.current.value == "" || valid === false) {
+            docNro.current.classList.add("is-invalid");
+            return false;
+        } else {
+            docNro.current.classList.remove("is-invalid");
+            docNro.current.classList.add("is-valid");
+            return true;
+        }
+    };
+    const validarNombre = () => {
+        if (datosFactura.docTipo.Id == 99) {
+            return true;
+        }
+        if (nombre.current.value == "") {
+            nombre.current.classList.add("is-invalid");
+            return false;
+        } else {
+            nombre.current.classList.remove("is-invalid");
+            nombre.current.classList.add("is-valid");
+            return true;
+        }
+    };
+    const validarProductos = () => {
+        if (datosFactura.productos.length === 0) {
+            sinProd.current.classList.add("bg-danger");
+            sinProd.current.classList.add("bg-danger");
+            return false;
+        } else {
+            return true;
+        }
+    };
+    //end-validates
 
-                <h3>Productos</h3>
-                <div className='row mt-4'>
-                    <FormProductos
-                        IVA={IVA}
-                        addProduct={addProduct}
-                    ></FormProductos>
-                </div>
-                <div className='row mt-4'>
-                    <button
-                        className='btn btn-primary col-12'
-                        onClick={() => {
-                            console.log(datosFactura);
-                        }}
+    const generarFactura = () => {
+        const QR = require("qrcode");
+        if (validarDocNro() && validarNombre() && validarProductos()) {
+            setLoading(true);
+            axios
+                .post(URL + "fe-createVoucher", {
+                    cbteTipo: datosFactura.cbteTipo.Id,
+                    concepto: 1,
+                    docTipo: datosFactura.docTipo.Id,
+                    docNro: datosFactura.docNro,
+                    fecha: moment(datosFactura.fecha).format("YYYYMMDD"),
+                    impTotal: datosFactura.total,
+                    impNeto: datosFactura.neto,
+                    iva: datosFactura.iva,
+                })
+                .then((response) => {
+                    if (response.data.error) {
+                        throw new Error(response.data.error);
+                    }
+                    setLoading(false);
+                    setDatosFactura({
+                        ...datosFactura,
+                        cae: response.data.CAE,
+                        nroCmp: response.data.voucherNumber,
+                        caeVto: response.data.CAEFchVto,
+                    });
+
+                    setDatosQR({
+                        fecha: moment(datosFactura.fecha).format("YYYYMMDD"),
+                        ptoVta: 5,
+                        tipoCmp: datosFactura.cbteTipo,
+                        nroCmp: datosFactura.nroCmp,
+                        importe: datosFactura.total,
+                        tipoDocRec: datosFactura.docTipo,
+                        nroDocRec: datosFactura.docNro,
+                        codAut: datosFactura.cae,
+                    });
+                    const btoa = (str) =>
+                        new Buffer.from(str).toString("base64");
+                    QR.toDataURL(
+                        "https://www.afip.gob.ar/fe/qr/?p=" +
+                            btoa(JSON.stringify(datosQR)),
+                        function (err, url) {
+                            setQr(url);
+                        }
+                    );
+                    handleModal(true);
+                })
+                .catch((err) => {
+                    props.setAlert(true);
+                    setLoading(false);
+                    props.setDataAlert({
+                        title: "Ups! algo salio mal...",
+                        body: err.message,
+                    });
+                });
+        }
+    };
+
+    return (
+        <Container>
+            <h3>Datos del cliente</h3>
+            <Row>
+                <Col xs={12} md={4} className='mt-4'>
+                    <label htmlFor='type' className='form-label'>
+                        Tipo de comprobante
+                    </label>
+                    <select
+                        className='form-select'
+                        name='cbteTipo'
+                        onChange={handleDatosFactura}
                     >
-                        Facturar
-                    </button>
-                </div>
-                <div className='row overflow-scroll'>
-                    <div className='col'>
-                        <TablaDeProductos
-                            productos={datosFactura.productos}
-                            deleteProducts={deleteProducts}
-                        />
-                    </div>
-                </div>
-                <div className='row'>
-                    <div className='col'>
-                        <TotalFactura datosFactura={datosFactura} />
-                    </div>
-                </div>
-            </div>
-        </div>
+                        {TYPE_CBT.map((type) => (
+                            <option
+                                key={`cbt-${type.Id}`}
+                                value={JSON.stringify(type)}
+                            >
+                                {type.Desc}
+                            </option>
+                        ))}
+                    </select>
+                </Col>
+                <Col xs={12} md={4} className='mt-4'>
+                    <label htmlFor='type' className='form-label'>
+                        Provincia
+                    </label>
+                    <select
+                        className='form-select'
+                        name='provincia'
+                        onChange={handleDatosFactura}
+                    >
+                        {PROVINCIAS.map((type) => (
+                            <option
+                                key={`provincia-${type.Id}`}
+                                value={type.Desc}
+                            >
+                                {type.Desc}
+                            </option>
+                        ))}
+                    </select>
+                </Col>
+                <Col xs={12} md={4} className='mt-4'>
+                    <label htmlFor='type' className='form-label'>
+                        Fecha
+                    </label>
+                    <DatePicker
+                        name='fecha'
+                        className='form-control'
+                        dateFormat='dd/MM/yyyy'
+                        selected={startDate}
+                        minDate={moment().subtract(5, "d")._d}
+                        maxDate={moment().add(5, "d")._d}
+                        onChange={(date) => {
+                            setStartDate(date);
+                            setDatosFactura({
+                                ...datosFactura,
+                                fecha: date,
+                            });
+                        }}
+                    />
+                </Col>
+            </Row>
+            <Row>
+                <Col xs={12} md={2} className='mt-4'>
+                    <label htmlFor='docTipo' className='form-label'>
+                        Doc. Tipo
+                    </label>
+                    <select
+                        className='form-select'
+                        name='docTipo'
+                        onChange={handleDatosFactura}
+                    >
+                        {DOC_TIPO.map((type) => (
+                            <option
+                                key={`doc-${type.Id}`}
+                                value={JSON.stringify(type)}
+                            >
+                                {type.Desc}
+                            </option>
+                        ))}
+                    </select>
+                </Col>
+                <Col xs={12} md={4} className='mt-4'>
+                    <label htmlFor='docNro' className='form-label'>
+                        Numero
+                    </label>
+                    {parseInt(datosFactura.docTipo.Id) === 99 ? (
+                        <input
+                            type='number'
+                            className='form-control'
+                            name='docNro'
+                            placeholder='Consumidor Final'
+                            value={0}
+                            disabled
+                        ></input>
+                    ) : (
+                        <input
+                            type='number'
+                            ref={docNro}
+                            className='form-control'
+                            name='docNro'
+                            autoComplete='off'
+                            onChange={handleDatosFactura}
+                        ></input>
+                    )}
+                </Col>
+                <Col xs={12} md={6} className='mt-4'>
+                    <label htmlFor='nombre' className='form-label'>
+                        Nombre o Razón social
+                    </label>
+                    {parseInt(datosFactura.docTipo.Id) === 99 ? (
+                        <input
+                            type='text'
+                            className='form-control'
+                            name='nombre'
+                            placeholder='Consumidor Final'
+                            value='Consumidor Final'
+                            disabled
+                        ></input>
+                    ) : (
+                        <input
+                            type='text'
+                            ref={nombre}
+                            className='form-control'
+                            name='nombre'
+                            required
+                            onChange={handleDatosFactura}
+                        ></input>
+                    )}
+                </Col>
+            </Row>
+            <hr />
+            <h3>Productos</h3>
+            <Row className='mt-4'>
+                <FormProductos
+                    IVA={IVA}
+                    addProduct={addProduct}
+                ></FormProductos>
+            </Row>
+
+            <Row>
+                <Col className='overflow-scroll'>
+                    <TablaDeProductos
+                        productos={datosFactura.productos}
+                        deleteProducts={deleteProducts}
+                        sinProd={sinProd}
+                    />
+                </Col>
+            </Row>
+            <Row>
+                <Col>
+                    <TotalFactura datosFactura={datosFactura} />
+                </Col>
+            </Row>
+            <Row className='mt-4'>
+                <Button
+                    type='button'
+                    variant='primary'
+                    onClick={generarFactura}
+                    disabled={loading}
+                >
+                    {loading ? "Enviando datos..." : " Generar Factura"}
+                </Button>
+            </Row>
+
+            <ModalBoleta
+                show={openModal}
+                handleModal={handleModal}
+                datosFactura={datosFactura}
+                qr={qr}
+            />
+        </Container>
     );
 };
 

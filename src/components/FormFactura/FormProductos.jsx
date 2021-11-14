@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import redondeo from "../../utils/redondeo";
 
 const FormProductos = ({ IVA, addProduct }) => {
     //Productos de la factura
@@ -17,8 +18,8 @@ const FormProductos = ({ IVA, addProduct }) => {
         e.preventDefault();
         let aux = items;
         aux.subtotal = Number(items.cantidad) * Number(items.precio);
-        aux.baseImponible = aux.subtotal / (1 + Number(items.iva));
-        aux.ivaMonto = aux.subtotal - aux.baseImponible;
+        aux.neto = redondeo(aux.subtotal / (1 + Number(items.iva)), 2);
+        aux.ivaMonto = redondeo(aux.subtotal - aux.neto, 2);
         setItems(aux);
         addProduct(items);
     };

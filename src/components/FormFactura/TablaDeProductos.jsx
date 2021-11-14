@@ -1,7 +1,7 @@
 import React from "react";
 import { v4 as uuidv4 } from "uuid";
 
-const TablaDeProductos = ({ productos, deleteProducts }) => {
+const TablaDeProductos = ({ productos, deleteProducts, sinProd }) => {
     return (
         <table className='table mt-4'>
             <thead>
@@ -11,13 +11,13 @@ const TablaDeProductos = ({ productos, deleteProducts }) => {
                     <th scope='col'>Descripcion</th>
                     <th scope='col'>Cant.</th>
                     <th scope='col'>Precio</th>
-                    <th scope='col'>base imponible</th>
+                    <th scope='col'>Neto</th>
                     <th scope='col'>iva</th>
                     <th scope='col'>subtotal</th>
                 </tr>
             </thead>
             <tbody>
-                {productos.length > 0 || productos != undefined ? (
+                {productos.length > 0 ? (
                     productos.map((prod, pos) => (
                         <tr key={uuidv4()}>
                             <th scope='row'>{pos + 1}</th>
@@ -39,7 +39,7 @@ const TablaDeProductos = ({ productos, deleteProducts }) => {
                                     <div>$</div>
                                     <div>
                                         {new Intl.NumberFormat("es-AR").format(
-                                            prod.baseImponible
+                                            prod.neto
                                         )}
                                     </div>
                                 </div>
@@ -83,7 +83,9 @@ const TablaDeProductos = ({ productos, deleteProducts }) => {
                     ))
                 ) : (
                     <tr>
-                        <th>Sin productos</th>
+                        <th ref={sinProd} colSpan={8} className='text-center'>
+                            Sin productos
+                        </th>
                     </tr>
                 )}
             </tbody>

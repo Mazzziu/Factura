@@ -1,32 +1,35 @@
 import React from "react";
+import { Stack, Badge } from "react-bootstrap";
 
 const TotalFactura = ({ datosFactura }) => {
     return (
-        <React.Fragment>
-            <span>TOTAL FACTURA</span>
-            <h3>
-                {datosFactura.hasOwnProperty("baseImp")
-                    ? `$${new Intl.NumberFormat("es-AR").format(
-                          Number(datosFactura.baseImp)
-                      )}`
-                    : 0}
-            </h3>
-            <h3>
-                {datosFactura.hasOwnProperty("iva")
-                    ? `$${new Intl.NumberFormat("es-AR").format(
-                          Number(datosFactura.iva)
-                      )}`
-                    : 0}
-            </h3>
-            <hr />
-            <h3>
-                {datosFactura.hasOwnProperty("total")
-                    ? `$${new Intl.NumberFormat("es-AR").format(
-                          Number(datosFactura.total)
-                      )}`
-                    : 0}
-            </h3>
-        </React.Fragment>
+        <Stack direction='horizontal' gap={3}>
+            <div className='ms-auto fs-4'>
+                <Badge bg='secondary' className='p-2'>
+                    {datosFactura.hasOwnProperty("neto")
+                        ? `NETO $${new Intl.NumberFormat("es-AR").format(
+                              Number(datosFactura.neto)
+                          )}`
+                        : 0}
+                </Badge>
+                <span> + </span>
+                <Badge bg='secondary' className='p-2'>
+                    {datosFactura.hasOwnProperty("iva")
+                        ? `IVA $${new Intl.NumberFormat("es-AR").format(
+                              Number(datosFactura.iva)
+                          )}`
+                        : 0}
+                </Badge>
+                <span> = </span>
+                <Badge bg='primary' className='p-2'>
+                    {datosFactura.hasOwnProperty("total")
+                        ? `TOTAL $${new Intl.NumberFormat("es-AR").format(
+                              Number(datosFactura.total)
+                          )}`
+                        : 0}
+                </Badge>
+            </div>
+        </Stack>
     );
 };
 
