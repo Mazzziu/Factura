@@ -165,15 +165,15 @@ const FormFactura = (props) => {
     //start-validates
     const validarDocNro = () => {
         let valid = true;
-        if (datosFactura.docTipo.Id == 99) {
+        if (Number(datosFactura.docTipo.Id) === 99) {
             return true;
         } else if (
-            datosFactura.docTipo.Id == 80 ||
-            datosFactura.docTipo.Id == 86
+            Number(datosFactura.docTipo.Id) === 80 ||
+            Number(datosFactura.docTipo.Id) === 86
         ) {
             let cuit = require("arg.js").cuit;
             valid = cuit.isValid(datosFactura.docNro);
-        } else if (datosFactura.docTipo.Id == 96) {
+        } else if (Number(datosFactura.docTipo.Id) === 96) {
             let doc = require("arg.js").document;
             valid = doc.isValidDni(datosFactura.docNro);
         }
@@ -187,10 +187,10 @@ const FormFactura = (props) => {
         }
     };
     const validarNombre = () => {
-        if (datosFactura.docTipo.Id == 99) {
+        if (Number(datosFactura.docTipo.Id) === 99) {
             return true;
         }
-        if (nombre.current.value == "") {
+        if (nombre.current.value === "") {
             nombre.current.classList.add("is-invalid");
             return false;
         } else {
