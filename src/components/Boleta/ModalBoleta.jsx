@@ -1,5 +1,5 @@
 import React from "react";
-import { PDFViewer } from "@react-pdf/renderer";
+import { PDFViewer, PDFDownloadLink } from "@react-pdf/renderer";
 import { Modal, Button } from "react-bootstrap";
 
 import Boleta from "./Boleta";
@@ -26,12 +26,26 @@ const ModalBoleta = (props) => {
                 >
                     Aceptar
                 </Button>
-                <Button
+                <PDFDownloadLink
                     variant='secondary'
                     onClick={() => props.handleModal(false)}
                 >
                     Descargar
-                </Button>
+                </PDFDownloadLink>
+                <PDFDownloadLink
+                    className='btn btn-secondary'
+                    document={
+                        <Boleta
+                            datosFactura={props.datosFactura}
+                            qr={props.qr}
+                        />
+                    }
+                    fileName={`${props.datosFactura.cbteTipo.Desc} ${props.datosFactura.nroCmp} ${props.datosFactura.nombre}.pdf`}
+                >
+                    {({ blob, url, loading, error }) =>
+                        loading ? "Loading document..." : "Descargar"
+                    }
+                </PDFDownloadLink>
             </Modal.Footer>
         </Modal>
     );
