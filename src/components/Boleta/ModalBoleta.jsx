@@ -27,12 +27,6 @@ const ModalBoleta = (props) => {
                     Aceptar
                 </Button>
                 <PDFDownloadLink
-                    variant='secondary'
-                    onClick={() => props.handleModal(false)}
-                >
-                    Descargar
-                </PDFDownloadLink>
-                <PDFDownloadLink
                     className='btn btn-secondary'
                     document={
                         <Boleta
