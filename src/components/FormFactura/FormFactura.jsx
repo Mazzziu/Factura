@@ -98,13 +98,8 @@ const FormFactura = (props) => {
         { Id: 22, Desc: "Tierra del Fuego" },
         { Id: 23, Desc: "Tucuman" },
     ];
-<<<<<<< HEAD
     // const URL = "https://backend-facturalin.herokuapp.com/api/test/";
     const URL = "https://backend-facturalin.herokuapp.com/api/";
-=======
-    const URL = "https://backend-facturalin.herokuapp.com/api/test/";
-    // const URL = "https://backend-facturalin.herokuapp.com/api/";
->>>>>>> 039e214792e4d0342bcb1d442ca59cf9fb1c0c6e
 
     //states
     const [datosFactura, setDatosFactura] = useDatosFactura(DOC_TIPO, TYPE_CBT);
