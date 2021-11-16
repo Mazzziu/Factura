@@ -98,9 +98,8 @@ const FormFactura = (props) => {
         { Id: 22, Desc: "Tierra del Fuego" },
         { Id: 23, Desc: "Tucuman" },
     ];
+    const URL = "https://backend-facturalin.herokuapp.com/api/test/";
     // const URL = "https://backend-facturalin.herokuapp.com/api/";
-    // const URL = "https://backend-facturalin.herokuapp.com/api/test/";
-    const URL = "https://backend-facturalin.herokuapp.com/api/";
 
     //states
     const [datosFactura, setDatosFactura] = useDatosFactura(DOC_TIPO, TYPE_CBT);
@@ -312,7 +311,7 @@ const FormFactura = (props) => {
                     </select>
                 </Col>
                 <Col xs={12} md={4} className='mt-4'>
-                    <label htmlFor='type' className='form-label'>
+                    <label htmlFor='fecha' className='form-label'>
                         Fecha
                     </label>
                     <DatePicker
