@@ -17,7 +17,6 @@ Font.register({ family: "Arial Bold", src: "./fonts/ArialBold.ttf" });
 const Boleta = ({ datosFactura, qr }) => {
     //var paginas = ['ORIGINAL'];
     var tipo = "ORIGINAL";
-
     const COLOR_PRINCIPAL = "#AB5F5F";
     const URL_LOGO =
         "https://d3ugyf2ht6aenh.cloudfront.net/stores/441/635/themes/common/logo-781526714-1615655564-d0adb210533f5ed73411f9acf0c47c3f1615655564.png?0";

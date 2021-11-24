@@ -1,6 +1,7 @@
 import React, { useRef, useState } from "react";
 import moment from "moment";
 import axios from "axios";
+import redondeo from "../../utils/redondeo";
 
 //components
 import FormProductos from "./FormProductos";
@@ -132,15 +133,14 @@ const FormFactura = (props) => {
     //end-handles
 
     const addProduct = (product) => {
-        const sumarTotal = (numero, attr) =>
-            datosFactura[attr] + Number(numero);
+        const sumar = (numero, attr) => datosFactura[attr] + Number(numero);
 
         setDatosFactura({
             ...datosFactura,
             productos: [...datosFactura.productos, product],
-            total: sumarTotal(product.subtotal, "total"),
-            iva: sumarTotal(product.ivaMonto, "iva"),
-            neto: sumarTotal(product.neto, "neto"),
+            total: redondeo(sumar(product.subtotal, "total"), 2),
+            iva: redondeo(sumar(product.ivaMonto, "iva"), 2),
+            neto: redondeo(sumar(product.neto, "neto"), 2),
         });
     };
     const deleteProducts = (product, pos) => {

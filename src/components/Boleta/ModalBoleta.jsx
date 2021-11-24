@@ -1,10 +1,11 @@
 import React from "react";
-import { PDFViewer, PDFDownloadLink } from "@react-pdf/renderer";
+import { PDFViewer, PDFDownloadLink, usePDF } from "@react-pdf/renderer";
 import { Modal, Button } from "react-bootstrap";
 
 import Boleta from "./Boleta";
 
 const ModalBoleta = (props) => {
+    const [instance, updateInstance] = usePDF({ document: Boleta });
     return (
         <Modal
             size='lg'
@@ -34,11 +35,12 @@ const ModalBoleta = (props) => {
                             qr={props.qr}
                         />
                     }
-                    fileName={`${props.datosFactura.cbteTipo.Desc} ${props.datosFactura.nroCmp} ${props.datosFactura.nombre}.pdf`}
+                    fileName={`${props.datosFactura.cbteTipo.Desc} [${props.datosFactura.provincia}] ${props.datosFactura.nombre}.pdf`}
                 >
-                    {({ blob, url, loading, error }) =>
-                        loading ? "Loading document..." : "Descargar"
-                    }
+                    {({ blob, url, loading, error }) => {
+                        console.log(error);
+                        return loading ? "Loading document..." : "Descargar";
+                    }}
                 </PDFDownloadLink>
             </Modal.Footer>
         </Modal>
